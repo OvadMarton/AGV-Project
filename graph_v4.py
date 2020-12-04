@@ -112,7 +112,6 @@ class graph:
 		end_node.g = end_node.h = end_node.f = 0
 		
 		open_list=[]
-		closed_list=[]
 		if end_node.vertex.v_id in self.parked_nodes:
 			raise NoPathError
 		open_list.append(start_node)
@@ -123,15 +122,7 @@ class graph:
 				if item.f < current_node.f:
 					current_node = item
 					current_index = index
-			try:
-				if current_node.vertex.v_id==current_node.parent.vertex.v_id:
-					None
-					# ~ print("current step is staying in place---------------------------------------------------------------------")
-					# ~ print(current_node.parent.vertex.v_id, "-->", current_node.vertex.v_id)
-			except AttributeError:
-				None
 			open_list.pop(current_index)
-			closed_list.append(current_node)
 			if current_node.vertex == end_node.vertex:
 				path=[]
 				current = current_node
@@ -140,39 +131,27 @@ class graph:
 					current = current.parent
 				route=path[::-1]
 				route.pop(0)
-				# ~ print("cost of path:", current_node.g)
-				# ~ print("cost of path:", current_node.f)
 				return route
 			children=[]
 			for adjacent in current_node.vertex.adj_vertices:
 				new_node=self.Node(self.vertices[adjacent-1], current_node, current_node.depth+1)
 				children.append(new_node)
-			stay=self.Node(current_node.vertex, current_node, current_node.depth+1)
-			stay.g=current_node.g+stay_in_place_cost #TODO növekmény értékét kitalálni pontosra
-			children.append(stay)
 			for child in children:
-				future_break=False
-				if child.same_exists(closed_list) or child.vertex.v_id==noGoThrough:
-					continue
+				edge_to_next=self.find_edge(current_node.vertex.v_id, child.vertex.v_id)
+				child.g=current_node.g+edge_to_next.weight
 				try:
-					edge_to_next=self.find_edge(current_node.vertex.v_id, child.vertex.v_id)
-					child.g=current_node.g+edge_to_next.weight
-					# ~ print("current_node_id:", current_node.vertex.v_id, "child_node_id:", child.vertex.v_id)
-					try:
-						turns=abs(self.find_direction(current_node.vertex.v_id, child.vertex.v_id)-self.find_direction(current_node.parent.vertex.v_id, current_node.vertex.v_id))/90
-						if turns==3:
-							child.g+=turn_cost
-						else:
-							child.g+=turns
-					except AttributeError:
-						turns=abs(self.find_direction(current_node.vertex.v_id, child.vertex.v_id)-facing)/90
-					except StayInPlace:
-						None
-				except NoEdge:
-					child.g=current_node.g+stay_in_place_cost
+					turns=abs(self.find_direction(current_node.vertex.v_id, child.vertex.v_id)-self.find_direction(current_node.parent.vertex.v_id, current_node.vertex.v_id))/90
+					if turns==3:
+						child.g+=turn_cost
+					else:
+						child.g+=turns
+				except AttributeError:
+					turns=abs(self.find_direction(current_node.vertex.v_id, child.vertex.v_id)-facing)/90
+				except StayInPlace:
+					None
 				child.h=math.sqrt((end_node.vertex.x-child.vertex.x)**2+(end_node.vertex.y-child.vertex.y)**2)
 				child.f=child.h+child.g
-				if child.same_exists(open_list) or child.same_exists(closed_list):
+				if child.same_exists(open_list):
 					None
 				else:
 					open_list.append(child)
