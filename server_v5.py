@@ -750,8 +750,8 @@ def manager(func, cmd): #a manager a megkapott parancsnak megfelelően jár el
 		msg["status"]=ids
 		report_to_node(msg)
 	if func_copy!="update_position":
-		func_to_call2=getattr(bots[target], "update_position")
-		func_to_call2()
+		func_to_call=getattr(bots[target], "update_position")
+		func_to_call()
 	bots[target].busy=False
 	# ~ print("busy set to false")
 	
