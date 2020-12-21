@@ -255,7 +255,6 @@ class robot:
 			except ValueError:
 				None
 		if len(options)==0:
-			
 			return self.LookForFreeNode(depth+1)
 		else:
 			print("Free Node Found:", options[0])
@@ -273,18 +272,7 @@ class robot:
 				self.IdleAvoid.set()
 				time.sleep(1)
 			time.sleep(0.1)
-			
-	def MovingDodger(self):
-		while True:
-			if self.busy==True and self.MovingAvoid.isSet():
-				self.MovingAvoid.clear()
-				freenode=self.LookForFreeNode()
-				self.path_to(freenode)
-				time.sleep(2)
-				self.MovingAvoid.set()
-				time.sleep(1)
-			time.sleep(0.1)
-			
+					
 	def nav_path(self):
 		global graph
 		global stop_all
@@ -298,7 +286,6 @@ class robot:
 			
 			self.update_position()
 			before=self.pos.node
-			
 			
 			ret_element=self.goto(route[i])
 			if ret_element==4:
